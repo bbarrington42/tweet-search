@@ -1,6 +1,4 @@
 // Lay the groundwork for application-only request to Twitter
-// todo Add TLS/SSL best practices discussed in Twitter Docs
-// todo Validate return value from 'bearerToken' call
 
 
 'use strict';
