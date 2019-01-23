@@ -7,6 +7,7 @@
 require('dotenv').config();
 
 const auth = require('./lib/auth');
+const util = require('./lib/util');
 const Twitter = require('twitter');
 
 const consumerKey = process.env.TWITTER_CONSUMER_KEY;
@@ -36,11 +37,16 @@ try {
             q: 'from:realDonaldTrump',
             tweet_mode: 'extended',
             result_type: 'recent'
-        }).then(json => console.log(json))
+            // todo Sort by Date
+        }).then(json => console.log(JSON.stringify(json,
+            (fieldName, fieldValue) => {
+                if (fieldName === 'created_at') return util.millisFromString(fieldValue); else return fieldValue
+            })))
     })
 } catch (err) {
     console.error(err);
 }
 
 
-
+// Need to parse:
+// "created_at": "Wed Jan 23 19:00:06 +0000 2019"
