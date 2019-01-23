@@ -34,6 +34,7 @@ try {
     twitterClient(consumerKey, consumerSecret).then(client => {
         client.get('https://api.twitter.com/1.1/search/tweets.json', {
             q: 'from:realDonaldTrump',
+            tweet_mode: 'extended',
             result_type: 'recent'
         }).then(json => console.log(json))
     })
