@@ -1,0 +1,16 @@
+{
+  "name": "tweet-search",
+  "version": "1.0.0",
+  "description": "Simple tweet search (experimental)",
+  "private": true,
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "assert": "^1.4.1",
+    "twitter": "^1.7.1"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  }
+}
