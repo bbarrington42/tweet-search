@@ -30,17 +30,16 @@ const twitterClient = (consumerKey, consumerSecret) => {
     })
 };
 
-twitterClient(consumerKey, consumerSecret).then(client => {
-    client.get('https://api.twitter.com/1.1/search/tweets.json', {
-        q: '@realDonaldTrump',
-        result_type: 'recent'
-    }, function(error, tweets, response) {
-        if(error) console.error(error); else {
-            console.log(tweets);
-            console.log(response);
-        }
+try {
+    twitterClient(consumerKey, consumerSecret).then(client => {
+        client.get('https://api.twitter.com/1.1/search/tweets.json', {
+            q: 'from:realDonaldTrump',
+            result_type: 'recent'
+        }).then(json => console.log(json))
     })
-}).catch(err => console.error(err));
+} catch (err) {
+    console.error(err);
+}
 
 
 
