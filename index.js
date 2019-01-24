@@ -36,7 +36,7 @@ const LatestTweetIntentHandler = {
         return latestTweet.then(tweet => {
 
             const tweetText = JSON.stringify(tweet.full_text);
-            const speechText = `Hello Trump Tweet Lovers! Here's my latest tweet ${tweetText}`;
+            const speechText = `Hello Trump Tweet Lovers! Here's my latest tweet. ${tweetText}`;
 
             return handlerInput.responseBuilder
                 .speak(speechText)
@@ -97,7 +97,7 @@ const ErrorHandler = {
 
         return handlerInput.responseBuilder
             .speak('Sorry, I can\'t understand the command. Have you considered applying for a job at the White House?')
-            .reprompt('Sorry, I can\'t understand the command. But Mexico will pay for the wall!')
+            .reprompt('Sorry, but there was no collusion. And Mexico will pay for the wall!')
             .getResponse();
     },
 };
