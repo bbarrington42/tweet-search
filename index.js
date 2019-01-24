@@ -1,68 +1,53 @@
-// Lay the groundwork for application-only request to Twitter
-
-
 'use strict';
+const Alexa = require('ask-sdk');
+const tweet = require('./lib/tweet');
 
-// todo How does this work in production?
-require('dotenv').config();
+const APP_ID = 'amzn1.ask.skill.e6029b28-6b6f-47a0-b508-d26ab5435921';
 
-const auth = require('./lib/auth');
-const util = require('./lib/util');
-const Twitter = require('twitter');
+const GET_TWEET_MESSAGE = "Here's the latest tweet from the orange moron: ";
+const HELP_MESSAGE = 'You can say give me the latest tweet';
+const HELP_REPROMPT = 'What can I help you with?';
+const STOP_MESSAGE = 'Goodbye!';
 
-const consumerKey = process.env.TWITTER_CONSUMER_KEY;
-const consumerSecret = process.env.TWITTER_CONSUMER_SECRET;
 
-// Returns a Promise resolving to a Twitter object on success
-const twitterClient = (consumerKey, consumerSecret) => {
-    return new Promise((resolve, reject) => {
+const latestTweet = tweet.getSortedTweets().then(tweets => {
+    return tweets[0];
+});
 
-        // Get a bearer token first
-        auth.bearerToken(consumerKey, consumerSecret, (err, bearerToken) => {
 
-            if (err) reject(err); else {
-                resolve(new Twitter({
-                    consumer_key: consumerKey,
-                    consumer_secret: consumerSecret,
-                    bearer_token: bearerToken
-                }))
-            }
-        })
-    })
+const handlers = {
+    'LaunchRequest': function () {
+        this.emit('GetLatestTweetIntent');
+    },
+    'GetLatestTweetIntent': function () {
+        latestTweet.then(tweet => {
+            const speechOutput = GET_TWEET_MESSAGE + tweet.full_text;
+
+            this.response.speak(speechOutput);
+            this.emit(':responseReady');
+        });
+    },
+    'AMAZON.HelpIntent': function () {
+        const speechOutput = HELP_MESSAGE;
+        const reprompt = HELP_REPROMPT;
+
+        this.response.speak(speechOutput).listen(reprompt);
+        this.emit(':responseReady');
+    },
+    'AMAZON.CancelIntent': function () {
+        this.response.speak(STOP_MESSAGE);
+        this.emit(':responseReady');
+    },
+    'AMAZON.StopIntent': function () {
+        this.response.speak(STOP_MESSAGE);
+        this.emit(':responseReady');
+    },
 };
 
-const sortedTweets = twitterClient(consumerKey, consumerSecret).then(client => {
+exports.handler = function (event, context, callback) {
+    const alexa = Alexa.handler(event, context, callback);
+    alexa.APP_ID = APP_ID;
+    alexa.registerHandlers(handlers);
+    alexa.execute();
+};
 
-    return client.get('https://api.twitter.com/1.1/search/tweets.json', {
-        q: 'from:realDonaldTrump',
-        tweet_mode: 'extended',
-        result_type: 'recent'
-    }).then(json => {
-        // Add a new field: created_at_millis
-        const statuses = json.statuses;
-        for(let i = 0; i < statuses.length; ++i) {
-            const elem = statuses[i];
-            elem.created_at_millis = new Date(elem.created_at).getTime();
-        }
-        return statuses;
-    }).then(json => {
-        return json.sort((tweet1, tweet2) => tweet2.created_at_millis - tweet1.created_at_millis);
-    }).catch(err => err);
-}).catch(err => err);
-
-
-const latest = sortedTweets.then(tweets => {
-    return tweets[0]
-});
-
-latest.then(l => {
-    console.log(JSON.stringify(l))
-});
-
-// const sorted = tweets.then(t => {
-//     console.log('t: ' + t);
-//     t.statuses.sort((tweet1, tweet2) => tweet2.getTime() - tweet1.getTime())
-// }).catch(err => err);
-//
-//
-// console.log(sorted);
