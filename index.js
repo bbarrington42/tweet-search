@@ -31,22 +31,35 @@ const twitterClient = (consumerKey, consumerSecret) => {
     })
 };
 
-try {
-    twitterClient(consumerKey, consumerSecret).then(client => {
-        client.get('https://api.twitter.com/1.1/search/tweets.json', {
-            q: 'from:realDonaldTrump',
-            tweet_mode: 'extended',
-            result_type: 'recent'
-            // todo Sort by Date
-        }).then(json => console.log(JSON.stringify(json,
+const sortedTweets = twitterClient(consumerKey, consumerSecret).then(client => {
+    return client.get('https://api.twitter.com/1.1/search/tweets.json', {
+        q: 'from:realDonaldTrump',
+        tweet_mode: 'extended',
+        result_type: 'recent'
+    }).then(json => {
+        return JSON.stringify(json,
             (fieldName, fieldValue) => {
-                if (fieldName === 'created_at') return util.millisFromString(fieldValue); else return fieldValue
-            })))
-    })
-} catch (err) {
-    console.error(err);
-}
+                if (fieldName === 'created_at') return new Date(fieldValue).getTime(); else return fieldValue;
+            })
+    }).then(json => {
+        const statuses = JSON.parse(json).statuses;
+        return statuses.sort((tweet1, tweet2) => tweet2.created_at - tweet1.created_at);
+    }).catch(err => err);
+}).catch(err => err);
 
 
-// Need to parse:
-// "created_at": "Wed Jan 23 19:00:06 +0000 2019"
+const latest = sortedTweets.then(tweets => {
+    return tweets[0]
+});
+
+latest.then(l => {
+    console.log(l)
+});
+
+// const sorted = tweets.then(t => {
+//     console.log('t: ' + t);
+//     t.statuses.sort((tweet1, tweet2) => tweet2.getTime() - tweet1.getTime())
+// }).catch(err => err);
+//
+//
+// console.log(sorted);
