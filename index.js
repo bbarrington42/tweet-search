@@ -32,18 +32,21 @@ const twitterClient = (consumerKey, consumerSecret) => {
 };
 
 const sortedTweets = twitterClient(consumerKey, consumerSecret).then(client => {
+
     return client.get('https://api.twitter.com/1.1/search/tweets.json', {
         q: 'from:realDonaldTrump',
         tweet_mode: 'extended',
         result_type: 'recent'
     }).then(json => {
-        return JSON.stringify(json,
-            (fieldName, fieldValue) => {
-                if (fieldName === 'created_at') return new Date(fieldValue).getTime(); else return fieldValue;
-            })
+        // Add a new field: created_at_millis
+        const statuses = json.statuses;
+        for(let i = 0; i < statuses.length; ++i) {
+            const elem = statuses[i];
+            elem.created_at_millis = new Date(elem.created_at).getTime();
+        }
+        return statuses;
     }).then(json => {
-        const statuses = JSON.parse(json).statuses;
-        return statuses.sort((tweet1, tweet2) => tweet2.created_at - tweet1.created_at);
+        return json.sort((tweet1, tweet2) => tweet2.created_at_millis - tweet1.created_at_millis);
     }).catch(err => err);
 }).catch(err => err);
 
@@ -53,7 +56,7 @@ const latest = sortedTweets.then(tweets => {
 });
 
 latest.then(l => {
-    console.log(l)
+    console.log(JSON.stringify(l))
 });
 
 // const sorted = tweets.then(t => {
