@@ -35,7 +35,8 @@ const LatestTweetIntentHandler = {
     handle(handlerInput) {
         return latestTweet.then(tweet => {
 
-            const speechText = `Hello Trump Tweet Lovers! Here's my latest tweet ${tweet}`;
+            const tweetText = JSON.stringify(tweet.full_text);
+            const speechText = `Hello Trump Tweet Lovers! Here's my latest tweet ${tweetText}`;
 
             return handlerInput.responseBuilder
                 .speak(speechText)
