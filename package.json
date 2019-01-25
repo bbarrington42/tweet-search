@@ -4,13 +4,13 @@
   "description": "Simple tweet search (experimental)",
   "private": true,
   "scripts": {
-    "test": "mocha",
-    "zip": "rm tweet_search.zip; zip -r tweet-search . -x \".*\""
+    "test": "mocha"
   },
   "dependencies": {
     "ask-sdk": "^2.3.0",
     "assert": "^1.4.1",
     "dotenv": "^6.2.0",
+    "line-reader-sync": "^0.1.0",
     "twitter": "^1.7.1"
   },
   "devDependencies": {
